@@ -99,12 +99,13 @@ On siis teoriassa mahdollista nopeuttaa päivitystä manuaalisen komennon suorit
 
 Asentaja suorittaa tarvittavat operaatiot seuraavassa järjestyksessä.
 
-1. Asentaa uudet paketit
-2. Luo tiedostot
-3. Aktivoi uudet palvelut
-4. Deaktivoi poistetut palvelut
-5. Poistaa poistetut paketit
-6. Tuhoaa poisteut tiedostot
+1. Päivittää nykyisen järjestelmän
+2. Asentaa uudet paketit
+3. Luo tiedostot
+4. Aktivoi uudet palvelut
+5. Deaktivoi poistetut palvelut
+6. Poistaa poistetut paketit
+7. Tuhoaa poisteut tiedostot
 
 ## Automaattisesti asennetut paketit
 
