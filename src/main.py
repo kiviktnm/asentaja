@@ -2,7 +2,7 @@ import argparse
 import sys
 import os
 
-import arconf.main
+import asentaja.main
 
 
 def is_root():
@@ -26,15 +26,15 @@ def run(repopath):
         exit(2)
 
     # Import the config file, it's existance should've been verified prevously.
-    # This imported module will edit variables from arconf modules.
+    # This imported module will edit variables from asentaja modules.
     import config
 
-    arconf.main.apply_config()
+    asentaja.main.apply_config()
 
 
 def main():
     parser = argparse.ArgumentParser(
-            prog="arconf",
+            prog="asentaja",
             description="A tool for declaratively managing Arch Linux.")
 
     parser.add_argument("repopath", help="configuration repository path")

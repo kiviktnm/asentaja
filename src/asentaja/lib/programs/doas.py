@@ -1,4 +1,4 @@
-import arconf
+import asentaja
 
 class Doas:
     enable = False
@@ -20,6 +20,6 @@ class Doas:
 
             config += "\n"
 
-            arconf.packages += [ "opendoas" ]
-            arconf.file_mappings["/etc/doas.conf"] = arconf.FileMapping(content=config, permissions=0o400)
+            asentaja.packages += [ "opendoas" ]
+            asentaja.file_mappings["/etc/doas.conf"] = asentaja.FileMapping(content=config, permissions=0o400)
 

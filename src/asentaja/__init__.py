@@ -1,6 +1,6 @@
 # This file contains the main global variables for configuring a system
 
-from arconf.main import FileMapping
+from asentaja.main import FileMapping
 
 
 file_mappings: dict[str, FileMapping] = {}

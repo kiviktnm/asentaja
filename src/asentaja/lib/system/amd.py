@@ -1,5 +1,5 @@
-import arconf
-import arconf.system
+import asentaja
+import asentaja.system
 
 class AMD:
     enable = False
@@ -9,23 +9,23 @@ class AMD:
 
     def apply(self):
         if self.enable:
-            arconf.packages += [
+            asentaja.packages += [
                 "mesa",
                 "libva-mesa-driver",
                 "mesa-vdpau"
             ]
 
             if self.ati:
-                arconf.packages += [ "xf86-video-ati" ]
-                arconf.system.boot.mkinitcpio_modules += [ "radeon" ]
+                asentaja.packages += [ "xf86-video-ati" ]
+                asentaja.system.boot.mkinitcpio_modules += [ "radeon" ]
             else:
-                arconf.system.boot.mkinitcpio_modules += [ "amdgpu" ]
-                arconf.packages += [ "xf86-video-amdgpu", "vulkan-radeon" ]
+                asentaja.system.boot.mkinitcpio_modules += [ "amdgpu" ]
+                asentaja.packages += [ "xf86-video-amdgpu", "vulkan-radeon" ]
                 if self.enable32bit:
-                    arconf.packages += [ "lib32-vulkan-radeon" ]
+                    asentaja.packages += [ "lib32-vulkan-radeon" ]
 
             if self.enable32bit:
-                arconf.packages += [
+                asentaja.packages += [
                     "lib32-mesa",
                     "lib32-libva-mesa-driver",
                     "lib32-mesa-vdpau"

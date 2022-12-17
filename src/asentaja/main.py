@@ -5,11 +5,11 @@ import subprocess
 import grp
 import pwd
 
-import arconf
-import arconf.options
-import arconf.settings
-from arconf.settings import commands as cmd
-import arconf.system
+import asentaja
+import asentaja.options
+import asentaja.settings
+from asentaja.settings import commands as cmd
+import asentaja.system
 
 
 class FileMapping:
@@ -40,7 +40,7 @@ class FileMapping:
 
 
 def apply_config():
-    arconf.options.apply_options()
+    asentaja.options.apply_options()
 
     # Order here is important
     _update_packages() # Updating packages may change files / services
@@ -48,8 +48,8 @@ def apply_config():
     _update_services()
 
     # This is not optimal, because not every time these need to be run, but for now, it is the easiest way to make sure everything is done correctly
-    if not arconf.system.boot.disable:
-        grub_cfg_path = os.path.join(arconf.settings.filesystem_root, "boot/grub/grub.cfg")
+    if not asentaja.system.boot.disable:
+        grub_cfg_path = os.path.join(asentaja.settings.filesystem_root, "boot/grub/grub.cfg")
         subprocess.run(cmd["grub-generate-config"].format(grub_cfg_path), shell=True)
 
         subprocess.run(cmd["mkinitcpio-generate"], shell= True)
@@ -63,12 +63,12 @@ def _update_packages():
     packages_to_install = []
     packages_to_uninstall = []
 
-    for pkg in arconf.packages:
+    for pkg in asentaja.packages:
         if pkg not in previously_installed_packages:
             packages_to_install.append(pkg)
 
     for pkg in previously_installed_packages:
-        if pkg not in arconf.packages:
+        if pkg not in asentaja.packages:
             packages_to_uninstall.append(pkg)
 
     if packages_to_install:
@@ -84,12 +84,12 @@ def _update_services():
     services_to_enable = []
     services_to_disable = []
 
-    for service in arconf.enabled_services:
+    for service in asentaja.enabled_services:
         if service not in previously_enabled_services:
             services_to_enable.append(service)
 
     for service in previously_enabled_services:
-        if service not in arconf.enabled_services:
+        if service not in asentaja.enabled_services:
             services_to_disable.append(service)
 
     for service in services_to_enable:
@@ -98,15 +98,15 @@ def _update_services():
     for service in services_to_disable:
         subprocess.run(cmd["disable-service"].format(service), shell=True)
 
-    _write_list("enabled_services", arconf.enabled_services)
+    _write_list("enabled_services", asentaja.enabled_services)
 
 
 def _update_files():
     previously_written_files = _read_list("written_files")
     written_files = []
 
-    for target, mapping in arconf.file_mappings.items():
-        file = os.path.normpath("/".join([arconf.settings.filesystem_root, target]))
+    for target, mapping in asentaja.file_mappings.items():
+        file = os.path.normpath("/".join([asentaja.settings.filesystem_root, target]))
         try:
             fdir = os.path.dirname(file)
 
@@ -145,7 +145,7 @@ def _update_files():
 
 def _read_list(name: str) -> list[str]:
     try:
-        with open(os.path.join(arconf.settings.filesystem_root, "var/lib/arconf/", name), "rt") as file:
+        with open(os.path.join(asentaja.settings.filesystem_root, "var/lib/asentaja/", name), "rt") as file:
             return file.read().split()
     except Exception as e:
         print(f"Failed to read saved list '{name}' with the following exception.")
@@ -154,7 +154,7 @@ def _read_list(name: str) -> list[str]:
 
 
 def _write_list(name: str, contents: list[str]):
-    directory = os.path.join(arconf.settings.filesystem_root, "var/lib/arconf/")
+    directory = os.path.join(asentaja.settings.filesystem_root, "var/lib/asentaja/")
     try:
         os.makedirs(directory, exist_ok=True)
         with open(os.path.join(directory, name), "wt") as file:

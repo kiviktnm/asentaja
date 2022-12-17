@@ -1,8 +1,8 @@
-import arconf
-import arconf.system
+import asentaja
+import asentaja.system
 
 class Nvidia:
-    # Note that currently configuring nvidia settings in arconf is not supported
+    # Note that currently configuring nvidia settings in asentaja is not supported
     enable = False
 
     package = "nvidia"
@@ -24,20 +24,20 @@ ACTION=="unbind", SUBSYSTEM=="pci", ATTR{vendor}=="0x10de", ATTR{class}=="0x0302
 
     def apply(self):
         if self.enable:
-            arconf.packages += [ self.package, self.utils_package ]
+            asentaja.packages += [ self.package, self.utils_package ]
 
-            # No need to add a pacman hook since arconf automatically updates initramfs every time anyways
+            # No need to add a pacman hook since asentaja automatically updates initramfs every time anyways
 
-            arconf.system.boot.kernel_parameters += [ "nvidia_drm.modeset=1" ]
-            arconf.system.boot.mkinitcpio_modules += [ "nvidia", "nvidia_modeset", "nvidia_uvm", "nvidia_drm" ]
+            asentaja.system.boot.kernel_parameters += [ "nvidia_drm.modeset=1" ]
+            asentaja.system.boot.mkinitcpio_modules += [ "nvidia", "nvidia_modeset", "nvidia_uvm", "nvidia_drm" ]
 
             if self.enable32bit:
-                arconf.packages += [ self.package32bit ]
+                asentaja.packages += [ self.package32bit ]
 
             if self.prime_offload:
-                arconf.packages += [ "nvidia-prime" ]
-                arconf.file_mappings["/etc/udev/rules.d/80-nvidia-pm.rules"] = arconf.FileMapping(content=self.prime_offload_udev_rules)
-                arconf.file_mappings["/etc/modprobe.d/nvidia-pm.conf"] = arconf.FileMapping(content=self.prime_offload_module_params)
-                arconf.enabled_services += [ "nvidia-persistenced.service" ]
+                asentaja.packages += [ "nvidia-prime" ]
+                asentaja.file_mappings["/etc/udev/rules.d/80-nvidia-pm.rules"] = asentaja.FileMapping(content=self.prime_offload_udev_rules)
+                asentaja.file_mappings["/etc/modprobe.d/nvidia-pm.conf"] = asentaja.FileMapping(content=self.prime_offload_module_params)
+                asentaja.enabled_services += [ "nvidia-persistenced.service" ]
 
 
