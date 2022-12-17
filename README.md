@@ -9,7 +9,12 @@ Mahdollistaa deklaratiivisen hallinan Arch Linuxille Pythonin avulla.
 Asenna minimaalinen Arch Linux instanssi joko noudattamalla [virallisia asennusohjeita](https://wiki.archlinux.org/title/Installation_guide) tai esimerkiksi `archinstall`-skriptin avulla.
 Huolehdi, että asennat Grub2:en bootloader-ohjelmaksi, sillä Asentaja käyttää sitä kernelin parametrien asettamiseen.
 
-Lisäksi asenna `python`, `git` ja `base-devel` sekä jokin tekstieditori kuten `neovim`.
+Lisäksi asenna `python`, `git` ja `base-devel` sekä jokin tekstieditori kuten `neovim`. Kun asennat `base-devel` pakettiryhmän, jätä `sudo` asentamatta ja asenna `opendoas` sen sijaan.
+
+Vaikka Asentaja ei tue pakettiryhmiä, voit asentaa `base-devel` ryhmän tässä vaiheessa, koska Asentaja asentaa sen sisältämät paketit `sudo`-pakettia lukuunottamatta itse automaattisesti.
+Tarkempaa tietoa löytyy [listasta automaattisesti asennetuista paketeista](#automaattisesti-asennetut-paketit).
+
+Tässä vaiheessa on myös hyvä luoda tavallinen käyttäjä järjestelmän normaaliajoon varsinkin silloin, jos osa tämän käyttäjän tiedostoista on Asentajan hallinnoimia.
 
 ### Asentajan asentaminen
 
@@ -36,15 +41,12 @@ Muokkaa `asetukset.py`-tiedostoa sopivaksi. Seuraava on esimerkki yksinkertaises
 import asentaja
 
 # Määrittele vaaditut paketit. Kaikki muut paketit poistetaan. Listaa myös AUR paketit tänne.
-# Asentaja asentaa itse `python` ja `git` paketit, koska se tarvitsee niitä toimiakseen.
+# Asentaja asentaa itse osan tarvitsemistaan paketeista.
 # Huomaa: Tällä hetkellä pakettiryhmät (package groups) eivät ole mahdollisia asentaa tällä tavalla. Listaa niiden sisältämät paketit erikseen.
 
 asentaja.paketit += [
-    # Vaaditut paketit
-    "base", "linux", "linux-firmware",
-
     # Dokumentaatio-ohjelmat
-    "man-pages", "man-db", "texinfo", "tldr",
+    "man-pages", "man-db", "tldr",
 
     # Verkko-ohjelma
     "networkmanager",
@@ -92,4 +94,43 @@ Samaa komentoa tulee käyttää jatkossa järjestelmän päivittämiseen ja joka
 
 Asentajan päivityskomento on hitaampi kuin päivitys pelkästään esim. `pikaur -Syu` komennolla, koska Asentaja uudelleenrakentaa Grub-asetukset ym. joka päivityksen yhteydessä varmuuden vuoksi.
 On siis teoriassa mahdollista nopeuttaa päivitystä manuaalisen komennon suorittamisella, mutta tämä ei ole suositeltavaa.
+
+## Asentajan toiminta
+
+Asentaja suorittaa tarvittavat operaatiot seuraavassa järjestyksessä.
+
+1. Asentaa uudet paketit
+2. Luo tiedostot
+3. Aktivoi uudet palvelut
+4. Deaktivoi poistetut palvelut
+5. Poistaa poistetut paketit
+6. Tuhoaa poisteut tiedostot
+
+## Automaattisesti asennetut paketit
+
+Asentaja asentaa automaattisesti itse tarvitsemansa paketit sekä paketit minimaalisen Arch Linuxin ylläpitoon.
+
+- base
+- linux
+- linux-firmware
+- python
+- git
+- opendoas
+- autoconf
+- automake
+- binutils
+- bison
+- debugedit
+- fakeroot
+- flex
+- gcc
+- groff
+- libtool
+- m4
+- make
+- patch
+- pkgconf
+- texinfo
+- which
+- pikaur (AUR)
 
