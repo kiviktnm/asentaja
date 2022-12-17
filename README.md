@@ -15,7 +15,7 @@ Lisäksi asenna `python`, `git` ja `base-devel` sekä jokin tekstieditori kuten 
 
 TODO: Rakenna automaattinen asennusohjelma ym.
 
-Asentaja asentaa automaattisesti myös [pikaur](https://github.com/actionless/pikaur#installation)-avustajaohjelman, joka mahdollistaa AUR ohjelmien asentamisen.
+Asentaja asentaa automaattisesti myös [pikaur](https://github.com/actionless/pikaur)-avustajaohjelman, joka mahdollistaa AUR ohjelmien asentamisen.
 Asentaja käyttää pikauria rajapintana pacmaniin, eli se asentaa tavallisetkin paketit pikaurin avulla.
 
 ### Käyttöönotto
