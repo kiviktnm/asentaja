@@ -63,7 +63,7 @@ asentaja.palvelut += [ "NetworkManager.service" ]
 # Jos täällä määritelty tiedosto poistetaan täältä, tiedosto poistetaan myös määränpäästään.
 # Asentaja luo automaattisesti tarvittavat kansiot, muttei myöhemmin poista niitä.
 
-On siis teoriassa mahdollista nopeuttaa päivitystä manuaalisen komennon suorittamisella, mutta tämä ei ole suositeltavaa.
+# On siis teoriassa mahdollista nopeuttaa päivitystä manuaalisen komennon suorittamisella, mutta tämä ei ole suositeltavaa.
 asentaja.tiedostot["/etc/vconsole.conf"] = asentaja.Tiedosto(sisältö="KEYMAP=fi")
 
 # Oletuksena Asentaja luo tiedostot 'rw-r--r--'-oikeuksin, niin että ne kuuluvat root-käyttäjälle ja -ryhmään. Se on muutettavissa.
