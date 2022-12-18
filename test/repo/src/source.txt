@@ -1,2 +1,0 @@
-This file contents will be copied to output directory.
-
