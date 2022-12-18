@@ -6,22 +6,39 @@ Mahdollistaa deklaratiivisen hallinan Arch Linuxille Pythonin avulla.
 
 ### Asenna Arch Linux
 
-Asenna minimaalinen Arch Linux instanssi joko noudattamalla [virallisia asennusohjeita](https://wiki.archlinux.org/title/Installation_guide) tai esimerkiksi `archinstall`-skriptin avulla.
-Huolehdi, että asennat Grub2:en bootloader-ohjelmaksi, sillä Asentaja käyttää sitä kernelin parametrien asettamiseen.
-
-Lisäksi asenna `python`, `git` ja `base-devel` sekä jokin tekstieditori kuten `neovim`. Kun asennat `base-devel` pakettiryhmän, jätä `sudo` asentamatta ja asenna `opendoas` sen sijaan.
-
-Vaikka Asentaja ei tue pakettiryhmiä, voit asentaa `base-devel` ryhmän tässä vaiheessa, koska Asentaja asentaa sen sisältämät paketit `sudo`-pakettia lukuunottamatta itse automaattisesti.
-Tarkempaa tietoa löytyy [listasta automaattisesti asennetuista paketeista](#automaattisesti-asennetut-paketit).
+Asenna minimaalinen Arch Linux instanssi joko noudattamalla [virallisia asennusohjeita](https://wiki.archlinux.org/title/Installation_guide) tai esimerkiksi archinstall-skriptin avulla. Huolehdi, että asennat Grub2:en bootloader-ohjelmaksi, sillä Asentaja käyttää sitä kernelin parametrien asettamiseen.
 
 Tässä vaiheessa on myös hyvä luoda tavallinen käyttäjä järjestelmän normaaliajoon varsinkin silloin, jos osa tämän käyttäjän tiedostoista on Asentajan hallinnoimia.
 
+### Asentajan tarvitsemat paketit
+
+Asentaja tarvitsee joitain paketteja toimiakseen. [Nämä paketit asentaja myös asentaa itse.](#automaattisesti-asennetut-paketit) Huomaa, että Asentaja omasta tahdostani johtuen jättää sudon asentamatta ja asentaa opendoas-paketin sen sijaan.
+
+Suorita seuraava komento asentaaksesi Asentajan vaatimat paketit.
+
+```
+# pacman -S --needed base linux linux-firmware python git opendoas autoconf automake binutils bison debugedit fakeroot flex gcc groff libtool m4 make patch pkgconf texinfo which grub efibootmgr
+```
+
+Käytännössä listattuna on perustavanlaatuiset paketit (base, linux, linux-firmware), python, git, opendoas, grub, ja base-devel-pakettiryhmän paketit.
+
+Huomaa, että koska sudoa ei ole asennettu, luo symbolinen linkki doas ja sudo-ohjelman välille.
+
+```
+# ln -s $(which doas) /usr/bin/sudo
+```
+
+Asenna myös [pikaur](https://github.com/actionless/pikaur)-avustajaohjelma. Asentaja käyttää pikauria rajapintana pacmaniin, eli se asentaa tavallisetkin paketit pikaurin avulla.
+
 ### Asentajan asentaminen
 
-TODO: Rakenna automaattinen asennusohjelma ym.
+Suorita seuraavat komennot:
 
-Asentaja asentaa automaattisesti myös [pikaur](https://github.com/actionless/pikaur)-avustajaohjelman, joka mahdollistaa AUR ohjelmien asentamisen.
-Asentaja käyttää pikauria rajapintana pacmaniin, eli se asentaa tavallisetkin paketit pikaurin avulla.
+```
+# git clone https://github.com/Windore/asentaja.git /opt/asentaja
+# cp /opt/asentaja/bin/asentaja /usr/local/bin/asentaja
+# cp /opt/asentaja/bin/päivitä-asentaja /usr/local/bin/päivitä-asentaja
+```
 
 ### Käyttöönotto
 
@@ -74,8 +91,7 @@ asentaja.mkinitcpio.modules += [ "nvidia", "nvidia_modeset", "nvidia_uvm", "nvid
 # Sekä grubin ja mkinitcpion lisäasetukset ovat nähtävillä tiedostoissa asentaja/grub.py ja asentaja/mkinitcpio.py
 ```
 
-Tämän jälkeen suorita seuraava komento root-käyttäjän oikeuksin saadaksesi `asetukset.py`-tiedoston mukaisen järjestelmän käyttöösi.
-Päivityskomento on interaktiivinen, eli se kysyy varmistuksia pakettien poistoista ja asentamisista. Tämä johtuu siitä, että Asentaja kutsuu pikaur-ohjelmaa suoraan.
+Tämän jälkeen suorita seuraava komento root-käyttäjän oikeuksin saadaksesi `asetukset.py`-tiedoston mukaisen järjestelmän käyttöösi. Päivityskomento on interaktiivinen, eli se kysyy varmistuksia pakettien poistoista ja asentamisista. Tämä johtuu siitä, että Asentaja kutsuu pikaur-ohjelmaa suoraan.
 
 ```
 # asentaja --päivitä --lähde polku/asetuskansion/luokse
@@ -85,14 +101,23 @@ Vain ensimmäisellä kerralla on tarpeellista määrittää Asentajan lähde, si
 
 ## Päivitykset
 
+### Järjestelmän päivitykset
+
 Päivityskomentoa tulee käyttää jatkossa järjestelmän päivittämiseen ja joka kerta kuin muuttaa `asetukset.py`-tiedostoa (tai sen kutsumia tiedostoja).
 
 ```
 # asentaja --päivitä
 ```
 
-Asentajan päivityskomento on hitaampi kuin päivitys pelkästään esim. `pikaur -Syu` komennolla, koska Asentaja uudelleenrakentaa Grub-asetukset ym. joka päivityksen yhteydessä varmuuden vuoksi.
-On siis teoriassa mahdollista nopeuttaa päivitystä manuaalisen komennon suorittamisella, mutta tämä ei ole suositeltavaa.
+Asentajan päivityskomento on hitaampi kuin päivitys pelkästään esim. `pikaur -Syu` komennolla, koska Asentaja uudelleenrakentaa Grub-asetukset ym. joka päivityksen yhteydessä varmuuden vuoksi. On siis teoriassa mahdollista nopeuttaa päivitystä manuaalisen komennon suorittamisella, mutta tämä ei ole suositeltavaa.
+
+### Asentajan päivittäminen
+
+Asentaja ei päivitä itseään järjestelmäpäivityksen aikana, vaan sen sijaan Asentajan mukana tulee ohjelma sen itsensä päivittämiseen .
+
+```
+# päivitä-asentaja
+```
 
 ## Asentajan toiminta
 

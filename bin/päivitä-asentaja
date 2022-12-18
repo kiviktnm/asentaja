@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# {} merkit pakottavat bashin lataamaan tiedoston sisällön muistiin, jolloin tiedosto voi itse päivittää itsensä (korvata itsensä)
+
+{
+    if [ "$EUID" -ne 0 ]
+        then echo "Suorita ohjelma root-käyttäjänä."
+        exit 1
+    fi
+
+    cd /opt/asentaja
+    git pull origin master
+
+    cp /opt/asentaja/bin/asentaja /usr/local/bin/asentaja
+    cp /opt/asentaja/bin/päivitä-asentaja /usr/local/bin/päivitä-asentaja
+}
