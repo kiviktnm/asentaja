@@ -12,7 +12,7 @@ def varmista_root():
     return os.geteuid() == 0
 
 
-def päivitä(asetuslähde):
+def päivitä(asetuslähde, vain_tiedostot):
     if not os.path.isdir(asetuslähde):
         print(f"Virheellinen asetuskansion sijainti '{asetuslähde}'.")
         exit(2)
@@ -33,7 +33,7 @@ def päivitä(asetuslähde):
     # Tämä suorittaa asetukset.py tiedoston, jonka pitäisi määritellä asennettava järjestelmä.
     import asetukset
 
-    asentaja.main.päivitys()
+    asentaja.main.päivitys(vain_tiedostot)
 
 
 def main():
@@ -44,6 +44,7 @@ def main():
     parser.add_argument("--lähde", help="asetuskansion sijainti, oletus on edellinen annettu sijainti")
     parser.add_argument("--ei-root", action="store_true", help="salli ohjelman suorittaminen tavallisena käyttäjänä")
     parser.add_argument("--päivitä", action="store_true", help="päivitä järjestelmä asetuskansion mukaisesti")
+    parser.add_argument("--vain-tiedostot", action="store_true", help="Asentaja muuttaa vain järjestelmän tiedostoja")
 
     args = parser.parse_args()
 
@@ -60,7 +61,7 @@ def main():
         asetuslähde = asentaja.tallennus.lue_lista("asetuslähde", salli_virheet=False)[0]
 
     if args.päivitä:
-        päivitä(asetuslähde)
+        päivitä(asetuslähde, args.vain_tiedostot)
 
 
 if __name__ == "__main__":

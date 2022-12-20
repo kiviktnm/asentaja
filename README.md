@@ -81,14 +81,20 @@ asentaja.tiedostot["/home/kk/.bin/hei.sh"] = asentaja.Tiedosto(sisältö="echo H
 # Asentaja lukee lähdetiedostot suhteessa `asetukset.py`-tiedoston kansioon, eli kansioon joka määriteltiin 'asentaja seuraa'-komennolla.
 asentaja.tiedostot["/etc/hostname"] = asentaja.Tiedosto(lähde="nimi.txt")
 
-# Määrittele kernelin parametrit. Edellyttää Grub2-ohjelmaa.
+# Määrittele komennot, jotka Asenta suorittaa päivityksen jälkeen. Huomaa, että komennot suoritetaan root-käyttäjän oikeuksin.
+asentaja.lopetuskomennot += [ "locale-gen" ]
+
+# Määrittele kernelin parametrit.
 # Muiden grub asetusten asettaminen tapahtuu myös tämän tiedoston avulla erikseen määriteltyjen asetuksien avulla.
 asentaja.grub.kernel_parametrit += [ "quiet", "splash" ]
 
 # Määrittele mkinitcpio moduulit yms.
 asentaja.mkinitcpio.modules += [ "nvidia", "nvidia_modeset", "nvidia_uvm", "nvidia_drm" ]
 
-# Sekä grubin ja mkinitcpion lisäasetukset ovat nähtävillä tiedostoissa asentaja/grub.py ja asentaja/mkinitcpio.py
+# Kun määrittelee mkinitcpion hookit, on poikkeuksellisesti hyödyllistä määritellä koko lista uudelleen, jotta järjestys on varmasti oikea.
+asentaja.mkinitcpio.hooks = [ "base", "udev", "autodetect", "modconf", "kms", "keyboard", "keymap", "consolefont", "block", "filesystems", "fsck" ]
+
+# Sekä grubin, doasin ja mkinitcpion lisäasetukset ovat nähtävillä tiedostoissa src/asentaja/grub.py, src/asentaja/doas.py ja src/asentaja/mkinitcpio.py
 ```
 
 Tämän jälkeen suorita seuraava komento root-käyttäjän oikeuksin saadaksesi `asetukset.py`-tiedoston mukaisen järjestelmän käyttöösi. Päivityskomento on interaktiivinen, eli se kysyy varmistuksia pakettien poistoista ja asentamisista. Tämä johtuu siitä, että Asentaja kutsuu pikaur-ohjelmaa suoraan.
@@ -111,6 +117,14 @@ Päivityskomentoa tulee käyttää jatkossa järjestelmän päivittämiseen ja j
 
 Asentajan päivityskomento on hitaampi kuin päivitys pelkästään esim. `pikaur -Syu` komennolla, koska Asentaja uudelleenrakentaa Grub-asetukset ym. joka päivityksen yhteydessä varmuuden vuoksi. On siis teoriassa mahdollista nopeuttaa päivitystä manuaalisen komennon suorittamisella, mutta tämä ei ole suositeltavaa.
 
+Pelkästään tiedostojen päivittäminen onnistuu lisäämällä komentoon argumentin `--vain-tiedostot`. Tämä on käytännöllistä esimerkiksi silloin, kun työskentelee asetustiedostojen parissa.
+
+```
+# asentaja --päivitä --vain-tiedostot
+```
+
+Huomaa, että jos esimerkiksi `mkinitcpio.conf`-tiedostoa muutetaan, sen vaikutukset eivät tule näkymään.
+
 ### Asentajan päivittäminen
 
 Asentaja ei päivitä itseään järjestelmäpäivityksen aikana, vaan sen sijaan Asentajan mukana tulee ohjelma sen itsensä päivittämiseen .
@@ -130,10 +144,11 @@ Asentaja suorittaa tarvittavat operaatiot seuraavassa järjestyksessä.
 5. Deaktivoi poistetut palvelut
 6. Poistaa poistetut paketit
 7. Tuhoaa poisteut tiedostot
+8. Suorittaa generoimiskomennot (mkinitcpio, grub, locale, ym)
 
 ## Automaattisesti asennetut paketit
 
-Asentaja asentaa automaattisesti itse tarvitsemansa paketit sekä paketit minimaalisen Arch Linuxin ylläpitoon.
+Asentaja asentaa automaattisesti itse tarvitsemansa paketit sekä paketit minimaalisen Arch Linuxin ylläpitoon. Sen lisäksi Asentaja huolehtii itse grub, mkinitcpio ja doas -ohjelmien asetuksien säätämisestä, jolloin niitä ei tarvitse tehdä *täysin* manuaalisesti (kts. esimerkkitiedosto).
 
 - base
 - linux

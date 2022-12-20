@@ -34,7 +34,6 @@ paketit = [
     "linux-firmware",
     "python",
     "git",
-    "opendoas",
     "autoconf",
     "automake",
     "binutils",
@@ -60,10 +59,13 @@ palvelut: list[str] = []
 
 tiedostot: dict[str, Tiedosto] = {}
 
+lopetuskomennot: list[str] = []
+
 import asentaja.grub
 grub = asentaja.grub.Grub()
 
 import asentaja.mkinitcpio
 mkinitcpio = asentaja.mkinitcpio.Mkinitcpio()
 
-
+import asentaja.doas
+doas = asentaja.doas.Doas()

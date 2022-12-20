@@ -7,14 +7,21 @@ import asentaja.tallennus
 import asentaja
 
 
-def päivitys():
+def päivitys(vain_tiedostot=False):
     # Suoritusjärjestyksellä on merkitystä
 
     asentaja.grub.asenna()
+    asentaja.mkinitcpio.asenna()
+    asentaja.doas.asenna()
 
     nykyiset_paketit = subprocess.check_output(cmd["listaa-asennetut"], shell=True).decode().split()
     nykyiset_palvelut = asentaja.tallennus.lue_lista("aktivoidut-palvelut")
     nykyiset_tiedostot = asentaja.tallennus.lue_lista("kirjoitetut-tiedostot")
+
+    if vain_tiedostot:
+        luodut_tiedostot = _luo_tiedostot()
+        _tuhoa_poistetut_tiedostot(nykyiset_tiedostot, luodut_tiedostot)
+        return
 
     _päivitä()
     _asenna_uudet_paketit(nykyiset_paketit)
@@ -24,8 +31,7 @@ def päivitys():
     _poista_poistetut_paketit(nykyiset_paketit)
     _tuhoa_poistetut_tiedostot(nykyiset_tiedostot, luodut_tiedostot)
 
-    _luo_grub_asetukset()
-    _generoi_mkinitcpio()
+    _suorita_lopetuskomennot()
 
 
 def _päivitä():
@@ -120,12 +126,12 @@ def _tuhoa_poistetut_tiedostot(nykyiset_tiedostot, luodut_tiedostot):
                 print(e)
 
 
-def _luo_grub_asetukset():
+def _suorita_lopetuskomennot():
     grub_asetusten_sijainti = os.path.join(tiedostojärjestelmän_alku, "boot/grub/grub.cfg")
     subprocess.run(cmd["luo-grub-asetukset"].format(grub_asetusten_sijainti), shell=True)
-
-
-def _generoi_mkinitcpio():
+    
     subprocess.run(cmd["generoi-mkinitcpio"], shell=True)
 
+    for komento in asentaja.lopetuskomennot:
+        subprocess.run(komento, shell=True)
 
