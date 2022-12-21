@@ -81,8 +81,11 @@ asentaja.tiedostot["/home/kk/.bin/hei.sh"] = asentaja.Tiedosto(sisältö="echo H
 # Asentaja lukee lähdetiedostot suhteessa `asetukset.py`-tiedoston kansioon, eli kansioon joka määriteltiin 'asentaja seuraa'-komennolla.
 asentaja.tiedostot["/etc/hostname"] = asentaja.Tiedosto(lähde="nimi.txt")
 
-# Määrittele komennot, jotka Asenta suorittaa päivityksen jälkeen. Huomaa, että komennot suoritetaan root-käyttäjän oikeuksin.
+# Määrittele komennot, jotka Asentaja suorittaa päivityksen jälkeen. Huomaa, että komennot suoritetaan root-käyttäjän oikeuksin.
 asentaja.lopetuskomennot += [ "locale-gen" ]
+
+# Määrittele komennot, jotka Asentaja suorittaa vain yhden kerran kun ne ensimmäisen kerran määritellään.
+asentaja.aktivointikomennot += [ "echo En keksi parempaa esimerkkiä" ]
 
 # Määrittele kernelin parametrit.
 # Muiden grub asetusten asettaminen tapahtuu myös tämän tiedoston avulla erikseen määriteltyjen asetuksien avulla.
@@ -144,8 +147,9 @@ Asentaja suorittaa tarvittavat operaatiot seuraavassa järjestyksessä.
 5. Deaktivoi poistetut palvelut
 6. Poistaa poistetut paketit
 7. Tuhoaa poisteut tiedostot
-8. Suorittaa generoimiskomennot (mkinitcpio, grub)
-9. Suorittaa muut lopetuskomennot
+8. Suorittaa vain kerran suoritettavat aktivointikomennot
+9. Suorittaa generoimiskomennot (mkinitcpio, grub)
+10. Suorittaa muut lopetuskomennot
 
 Asentaja on suunniteltu jatkamaan toimintaansa siitä huolimatta, että se mahdollisesti kohtaa virheitä. Poikkeuksena tähän ovat virheet, jotka koskevat järjestelmän pakettien listausta ja päivittämistä sekä uusien pakettien asentamista. Näissä tapauksissa Asentaja lopettaa suorittamisensa. Muulloin vain virheistä tiedotetaan.
 

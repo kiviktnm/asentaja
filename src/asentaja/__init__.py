@@ -61,6 +61,8 @@ tiedostot: dict[str, Tiedosto] = {}
 
 lopetuskomennot: list[str] = []
 
+aktivointikomennot: list[str] = []
+
 import asentaja.grub
 grub = asentaja.grub.Grub()
 

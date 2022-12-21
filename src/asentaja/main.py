@@ -23,6 +23,7 @@ def päivitys(vain_tiedostot=False):
 
     nykyiset_palvelut = asentaja.tallennus.lue_lista("aktivoidut-palvelut")
     nykyiset_tiedostot = asentaja.tallennus.lue_lista("kirjoitetut-tiedostot")
+    suoritetut_aktivointikomennot = asentaja.tallennus.lue_lista("suoritetut-aktivointikomennot")
 
     if vain_tiedostot:
         luodut_tiedostot = _luo_tiedostot()
@@ -31,16 +32,21 @@ def päivitys(vain_tiedostot=False):
 
     _päivitä()
     _asenna_uudet_paketit(nykyiset_paketit)
+
+    # _luo_tiedostot() uudelleenluo kaikki tiedostot jolloin ei ole oleellista ottaa huomioon aikaisemmin tehtyja asioita kuten esim palveluiden kohdalla täytyy.
     luodut_tiedostot = _luo_tiedostot()
-    aktivoidut_palvelut, valmiiksi_aktivoidut_palvelut = _aktivoi_uudet_palvelut(nykyiset_palvelut)
+    kaikki_aktivoidut_palvelut = _aktivoi_uudet_palvelut(nykyiset_palvelut)
     _deaktivoi_poistetut_palvelut(nykyiset_palvelut)
     _poista_poistetut_paketit(nykyiset_paketit)
     _tuhoa_poistetut_tiedostot(nykyiset_tiedostot, luodut_tiedostot)
 
-    asentaja.tallennus.kirjoita_lista("kirjoitetut-tiedostot", sisältö=luodut_tiedostot)
-    asentaja.tallennus.kirjoita_lista("aktivoidut-palvelut", sisältö=aktivoidut_palvelut+valmiiksi_aktivoidut_palvelut)
+    kaikki_suoritetut_aktivointikomennot = _suorita_aktivointikomennot(suoritetut_aktivointikomennot)
 
     _suorita_lopetuskomennot()
+
+    asentaja.tallennus.kirjoita_lista("kirjoitetut-tiedostot", sisältö=luodut_tiedostot)
+    asentaja.tallennus.kirjoita_lista("aktivoidut-palvelut", sisältö=kaikki_aktivoidut_palvelut)
+    asentaja.tallennus.kirjoita_lista("suoritetut-aktivointikomennot", sisältö=kaikki_suoritetut_aktivointikomennot)
 
 
 def _päivitä():
@@ -119,7 +125,8 @@ def _aktivoi_uudet_palvelut(nykyiset_palvelut):
                 print(f"Palvelun '{palvelu}' aktivointi epäonnistui.")
                 print(e)
 
-    return (aktivoitavat_palvelut, aikaisemmin_aktivoidut_palvelut)
+    # Palauttaa kaikki koskaan aktivoidut palvelut (ei vain tällä kertaa aktivoidut)
+    return aktivoitavat_palvelut + aikaisemmin_aktivoidut_palvelut
 
 
 def _deaktivoi_poistetut_palvelut(nykyiset_palvelut):
@@ -159,6 +166,24 @@ def _tuhoa_poistetut_tiedostot(nykyiset_tiedostot, luodut_tiedostot):
                 print(e)
 
 
+def _suorita_aktivointikomennot(suoritetut_aktivointikomennot):
+    aikaisemmin_suoritetut_aktivointikomennot = []
+    nyt_suoritetut_aktivointikomennot = []
+
+    for komento in asentaja.aktivointikomennot:
+        if komento in suoritetut_aktivointikomennot:
+            aikaisemmin_suoritetut_aktivointikomennot.append(komento)
+        else:
+            try:
+                subprocess.run(komento, shell=True, check=True)
+                nyt_suoritetut_aktivointikomennot.append(komento)
+            except subprocess.CalledProcessError as e:
+                print(f"Aktivointikomennon '{komento}' suorittaminen epäonnistui.")
+                print(e)
+
+    return aikaisemmin_suoritetut_aktivointikomennot + nyt_suoritetut_aktivointikomennot
+
+
 def _suorita_lopetuskomennot():
     grub_asetusten_sijainti = os.path.join(tiedostojärjestelmän_alku, "boot/grub/grub.cfg")
 
@@ -173,6 +198,6 @@ def _suorita_lopetuskomennot():
         try:
             subprocess.run(komento, shell=True, check=True)
         except subprocess.CalledProcessError as e:
-            print(f"Lopetuskomennon '{komento}' suoritus epäonnistui.")
+            print(f"Lopetuskomennon '{komento}' suorittaminen epäonnistui.")
             print(e)
 

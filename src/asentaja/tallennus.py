@@ -14,6 +14,7 @@ def lue_lista(nimi, oletus=[], salli_virheet=True):
             return t.read().split()
     except:
         if salli_virheet:
+            print(f"Asentajan oman tiedoston '{tiedosto}' luku epäonnistui. Oletetaan, että kaikki on kunnossa.")
             return oletus
         else:
             print(f"Asentajan oman tiedoston '{tiedosto}' luku epäonnistui.")
@@ -28,7 +29,9 @@ def kirjoita_lista(nimi, sisältö=[], salli_virheet=False):
         with open(tiedosto, "wt") as t:
             t.write("\n".join(sisältö))
     except:
-        if not salli_virheet:
+        if salli_virheet:
+            print(f"Asentajan oman tiedoston '{tiedosto}' kirjoitus epäonnistui. Oletetaan, että kaikki on kunnossa.")
+        else:
             print(f"Asentajan oman tiedoston '{tiedosto}' kirjoitus epäonnistui.")
             raise
 
