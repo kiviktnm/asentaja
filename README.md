@@ -144,7 +144,10 @@ Asentaja suorittaa tarvittavat operaatiot seuraavassa järjestyksessä.
 5. Deaktivoi poistetut palvelut
 6. Poistaa poistetut paketit
 7. Tuhoaa poisteut tiedostot
-8. Suorittaa generoimiskomennot (mkinitcpio, grub, locale, ym)
+8. Suorittaa generoimiskomennot (mkinitcpio, grub)
+9. Suorittaa muut lopetuskomennot
+
+Asentaja on suunniteltu jatkamaan toimintaansa siitä huolimatta, että se mahdollisesti kohtaa virheitä. Poikkeuksena tähän ovat virheet, jotka koskevat järjestelmän pakettien listausta ja päivittämistä sekä uusien pakettien asentamista. Näissä tapauksissa Asentaja lopettaa suorittamisensa. Muulloin vain virheistä tiedotetaan.
 
 ## Automaattisesti asennetut paketit
 
