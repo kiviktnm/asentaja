@@ -95,9 +95,8 @@ def _luo_tiedostot():
 
             luo_kansio(tiedoston_kansio)
 
-            with open(tiedosto, "wt") as t:
-                t.write(lähde.hanki_sisältö())
-                luodut_tiedostot.append(tiedosto)
+            lähde.kirjoita_tiedostoon(tiedosto)
+            luodut_tiedostot.append(tiedosto)
             
             os.chmod(tiedosto, lähde.oikeudet)
             os.chown(tiedosto, lähde.uid(), lähde.gid())

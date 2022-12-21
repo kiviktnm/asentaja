@@ -9,17 +9,19 @@ class Tiedosto:
         self.omistaja = omistaja
         self.ryhmä = ryhmä
 
-    def hanki_sisältö(self):
+    def kirjoita_tiedostoon(self, tiedosto):
+        sisältö = bytes(self.sisältö, "utf-8")
+
         if self.lähde is not None:
             try:
-                with open(self.lähde, "rt") as tiedosto:
-                    return tiedosto.read()
-            except Exception as e:
+                with open(self.lähde, "rb") as lähde:
+                    sisältö = lähde.read()
+            except:
                 print(f"Tiedoston '{self.lähde}' lukeminen epäonnistui.")
-                print(e)
-                return self.sisältö
-        else:
-            return self.sisältö
+                raise
+
+        with open(tiedosto, "wb") as kohde:
+            kohde.write(sisältö)
 
     def uid(self):
         return pwd.getpwnam(self.omistaja).pw_uid
