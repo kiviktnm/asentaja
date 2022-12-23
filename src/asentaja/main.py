@@ -14,6 +14,13 @@ def päivitys(vain_tiedostot=False):
     asentaja.mkinitcpio.asenna()
     asentaja.doas.asenna()
 
+    nykyiset_tiedostot = asentaja.tallennus.lue_lista("kirjoitetut-tiedostot")
+
+    if vain_tiedostot:
+        luodut_tiedostot = _luo_tiedostot()
+        _tuhoa_poistetut_tiedostot(nykyiset_tiedostot, luodut_tiedostot)
+        return
+
     try:
         nykyiset_paketit = subprocess.check_output(cmd["listaa-asennetut"], shell=True).decode().split()
     except subprocess.CalledProcessError as e:
@@ -22,13 +29,8 @@ def päivitys(vain_tiedostot=False):
         exit(10)
 
     nykyiset_palvelut = asentaja.tallennus.lue_lista("aktivoidut-palvelut")
-    nykyiset_tiedostot = asentaja.tallennus.lue_lista("kirjoitetut-tiedostot")
     suoritetut_aktivointikomennot = asentaja.tallennus.lue_lista("suoritetut-aktivointikomennot")
 
-    if vain_tiedostot:
-        luodut_tiedostot = _luo_tiedostot()
-        _tuhoa_poistetut_tiedostot(nykyiset_tiedostot, luodut_tiedostot)
-        return
 
     _päivitä()
     _asenna_uudet_paketit(nykyiset_paketit)
@@ -81,27 +83,17 @@ def _luo_tiedostot():
         # Tämä sallii kahden polun, jotka molemmat alkavat '/'-merkillä yhteen liittämisen
         tiedosto = os.path.normpath("/".join([tiedostojärjestelmän_alku, kohde]))
         try:
-            tiedoston_kansio = os.path.dirname(tiedosto)
-
-            # Tämä luo puuttuvat kansiot rekursiivisesti ja asettaa niiden omistajan / ryhmän samaksi
-            # kuin uuden tiedoston.
-            def luo_kansio(kansio):
-                if not os.path.isdir(kansio):
-                    ylempi_kansio = os.path.dirname(kansio)
-                    if not os.path.isdir(ylempi_kansio):
-                        luo_kansio(ylempi_kansio)
-                    os.mkdir(kansio)
-                    os.chown(kansio, lähde.uid(), lähde.gid())
-
-            luo_kansio(tiedoston_kansio)
-
-            lähde.kirjoita_tiedostoon(tiedosto)
-            luodut_tiedostot.append(tiedosto)
-            
-            os.chmod(tiedosto, lähde.oikeudet)
-            os.chown(tiedosto, lähde.uid(), lähde.gid())
+            luodut_tiedostot.append(lähde.kirjoita_tiedostoon(tiedosto))
         except OSError as e:
             print(f"Tiedoston '{tiedosto}' kirjoittaminen epäonnistui.")
+            print(e)
+
+    for kohde, lähde in asentaja.kansiot.items():
+        kansio = os.path.normpath("/".join([tiedostojärjestelmän_alku, kohde]))
+        try:
+            luodut_tiedostot += lähde.kirjoita_kansioon(kansio)
+        except OSError as e:
+            print(f"Kansion '{kansio}' luominen epäonnistui.")
             print(e)
 
     return luodut_tiedostot
