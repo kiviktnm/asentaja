@@ -81,6 +81,9 @@ asentaja.tiedostot["/home/kk/.bin/hei.sh"] = asentaja.Tiedosto(sisältö="echo H
 # Asentaja lukee lähdetiedostot suhteessa `asetukset.py`-tiedoston kansioon, eli kansioon joka määriteltiin 'asentaja seuraa'-komennolla.
 asentaja.tiedostot["/etc/hostname"] = asentaja.Tiedosto(lähde="nimi.txt")
 
+# Kuten tiedostoja Asentaja voi asentaa myös kansioita.
+asentaja.kansiot["/home/kk/.bin/"] = asentaja.Kansio(lähde="bin/", omistaja="kk", oikeudet=0o744)
+
 # Määrittele komennot, jotka Asentaja suorittaa päivityksen jälkeen. Huomaa, että komennot suoritetaan root-käyttäjän oikeuksin.
 asentaja.lopetuskomennot += [ "locale-gen" ]
 
