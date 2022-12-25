@@ -78,7 +78,7 @@ asentaja.tiedostot["/etc/vconsole.conf"] = asentaja.Tiedosto(sisältö="KEYMAP=f
 # Oletuksena Asentaja luo tiedostot 'rw-r--r--'-oikeuksin, niin että ne kuuluvat root-käyttäjälle ja -ryhmään. Se on muutettavissa.
 asentaja.tiedostot["/home/kk/.bin/hei.sh"] = asentaja.Tiedosto(sisältö="echo Hei!", omistaja="kk", ryhmä="kk", oikeudet=0o744)
 
-# Asentaja lukee lähdetiedostot suhteessa `asetukset.py`-tiedoston kansioon, eli kansioon joka määriteltiin 'asentaja seuraa'-komennolla.
+# Asentaja lukee lähdetiedostot suhteessa `asetukset.py`-tiedoston kansioon, eli kansioon joka määriteltiin 'asentaja --lähde'-komennolla.
 asentaja.tiedostot["/etc/hostname"] = asentaja.Tiedosto(lähde="nimi.txt")
 
 # Kuten tiedostoja Asentaja voi asentaa myös kansioita.
