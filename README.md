@@ -38,6 +38,8 @@ Suorita seuraavat komennot:
 # git clone https://github.com/Windore/asentaja.git /opt/asentaja
 # cp /opt/asentaja/bin/asentaja /usr/local/bin/asentaja
 # cp /opt/asentaja/bin/päivitä-asentaja /usr/local/bin/päivitä-asentaja
+# chmod +x /usr/local/bin/asentaja
+# chmod +x /usr/local/bin/päivitä-asentaja
 ```
 
 ### Käyttöönotto
