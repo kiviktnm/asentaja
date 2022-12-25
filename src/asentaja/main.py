@@ -31,7 +31,6 @@ def päivitys(vain_tiedostot=False):
     nykyiset_palvelut = asentaja.tallennus.lue_lista("aktivoidut-palvelut")
     suoritetut_aktivointikomennot = asentaja.tallennus.lue_lista("suoritetut-aktivointikomennot")
 
-
     _päivitä()
     _asenna_uudet_paketit(nykyiset_paketit)
 
@@ -179,8 +178,8 @@ def _suorita_lopetuskomennot():
     grub_asetusten_sijainti = os.path.join(tiedostojärjestelmän_alku, "boot/grub/grub.cfg")
 
     try:
-        subprocess.run(cmd["luo-grub-asetukset"].format(grub_asetusten_sijainti), shell=True)
-        subprocess.run(cmd["generoi-mkinitcpio"], shell=True)
+        subprocess.run(cmd["luo-grub-asetukset"].format(grub_asetusten_sijainti), shell=True, check=True)
+        subprocess.run(cmd["generoi-mkinitcpio"], shell=True, check=True)
     except subprocess.CalledProcessError as e:
         print("Grub-asetuksien tai mkinitcpion generaatio epäonnistui.")
         print(e)
