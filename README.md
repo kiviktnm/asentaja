@@ -74,6 +74,7 @@ asentaja.palvelut += [ "NetworkManager.service" ]
 # Määrittele tiedostot, joita Asentaja ylläpitää.
 # Jos täällä määritelty tiedosto poistetaan täältä, tiedosto poistetaan myös määränpäästään.
 # Asentaja luo automaattisesti tarvittavat kansiot, muttei myöhemmin poista niitä.
+# Huomaa, että Asentaja ei tue symbolisia linkkejä. Jos asentajan lähdetiedostona on symbolinen linkki, asentaja lukee linkin osoittaman tiedoston ja kirjoittaa sen sisällön kohteeseensa.
 
 asentaja.tiedostot["/etc/vconsole.conf"] = asentaja.Tiedosto(sisältö="KEYMAP=fi")
 
