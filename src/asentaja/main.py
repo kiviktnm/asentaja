@@ -82,7 +82,7 @@ def _luo_tiedostot():
         # Tämä sallii kahden polun, jotka molemmat alkavat '/'-merkillä yhteen liittämisen
         tiedosto = os.path.normpath("/".join([tiedostojärjestelmän_alku, kohde]))
         try:
-            luodut_tiedostot.append(lähde.kirjoita_tiedostoon(tiedosto))
+            luodut_tiedostot += lähde.kirjoita_tiedostoon(tiedosto)
         except OSError as e:
             print(f"Tiedoston '{tiedosto}' kirjoittaminen epäonnistui.")
             print(e)
