@@ -80,8 +80,8 @@ class Kansio:
                     print(f"Kansiota '{kansio}' luodess tiedoston '{lähdetiedosto}' kopiointi kohteeseen '{kohdetiedosto}' epäonnistui.")
                     print(e)
 
-                os.chmod(tiedosto, self.oikeudet)
-                os.chown(tiedosto, self.uid(), self.gid())
+                os.chmod(kohdetiedosto, self.oikeudet)
+                os.chown(kohdetiedosto, self.uid(), self.gid())
 
         return luodut_tiedostot
 
