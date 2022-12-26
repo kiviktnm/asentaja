@@ -5,7 +5,7 @@ class Mkinitcpio:
     modules = []
     files = []
     binaries = []
-    extra_asetukset = []
+    extra_asetukset = ""
 
     def asenna(self):
         mkinitcpio_asetukset = f"""# Tämä tiedosto on Asentajan automaattisesti luoma.
