@@ -1,7 +1,7 @@
 
 komennot: dict[str, str] = {}
 komennot["päivitä"] = "pikaur -Syu"
-komennot["asenna"] = "pikaur -S {}"
+komennot["asenna"] = "pikaur -S --asexplicit {}"
 komennot["poista"] = "pikaur -Rs {}"
 komennot["listaa-asennetut"] = "pikaur -Qeq"
 komennot["aktivoi-palvelu"] = "systemctl enable {}"
