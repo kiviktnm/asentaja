@@ -3,6 +3,8 @@
 import os
 import asentaja.asetukset
 
+import asentaja.logger as log
+
 
 _sijainti = "var/lib/asentaja/"
 
@@ -12,13 +14,15 @@ def lue_lista(nimi, oletus=[], salli_virheet=True):
     try:
         with open(tiedosto, "rt") as t:
             return t.read().split()
-    except:
+    except OSError as e:
         if salli_virheet:
-            print(f"Asentajan oman tiedoston '{tiedosto}' luku epäonnistui. Oletetaan, että kaikki on kunnossa.")
+            log.varoitus(f"Asentajan oman tiedoston '{tiedosto}' luku epäonnistui.")
+            log.varoitus(f"Oletetaan, että tiedostoa ei ole vielä luotu.")
             return oletus
         else:
-            print(f"Asentajan oman tiedoston '{tiedosto}' luku epäonnistui.")
-            raise
+            log.virhe(f"Asentajan oman tiedoston '{tiedosto}' luku epäonnistui.")
+            log.virhetiedot(e)
+            exit(20)
 
 
 def kirjoita_lista(nimi, sisältö=[], salli_virheet=False):
@@ -28,10 +32,12 @@ def kirjoita_lista(nimi, sisältö=[], salli_virheet=False):
         os.makedirs(kansio, exist_ok=True)
         with open(tiedosto, "wt") as t:
             t.write("\n".join(sisältö))
-    except:
+    except OSError as e:
         if salli_virheet:
-            print(f"Asentajan oman tiedoston '{tiedosto}' kirjoitus epäonnistui. Oletetaan, että kaikki on kunnossa.")
+            log.varoitus(f"Asentajan oman tiedoston '{tiedosto}' kirjoitus epäonnistui.")
+            log.varoitus(f"Oletetaan, että virhe on merkityksetön.")
         else:
-            print(f"Asentajan oman tiedoston '{tiedosto}' kirjoitus epäonnistui.")
-            raise
+            log.virhe(f"Asentajan oman tiedoston '{tiedosto}' kirjoitus epäonnistui.")
+            log.virhetiedot(e)
+            exit(21)
 

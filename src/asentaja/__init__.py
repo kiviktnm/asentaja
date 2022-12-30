@@ -2,6 +2,8 @@ import grp
 import pwd
 import os
 
+import asentaja.logger as log
+
 # Tämä luo puuttuvat kansiot rekursiivisesti ja asettaa niiden omistajan / ryhmän samaksi
 # kuin uuden tiedoston.
 def _luo_puuttuvat_kansiot(kansio, omistaja_uid, ryhmä_gid):
@@ -21,25 +23,24 @@ class Tiedosto:
         self.ryhmä = ryhmä
 
     def kirjoita_tiedostoon(self, tiedosto):
-        """Kirjoittaa sisältönsä syötetyyn tiedostoon."""
-
         sisältö = bytes(self.sisältö, "utf-8")
 
-        if self.lähde is not None:
-            try:
+        try:
+            if self.lähde is not None:
                 with open(self.lähde, "rb") as lähde:
                     sisältö = lähde.read()
-            except:
-                print(f"Tiedoston '{self.lähde}' lukeminen epäonnistui.")
-                raise
 
-        _luo_puuttuvat_kansiot(os.path.dirname(tiedosto), self.uid(), self.gid())
+            _luo_puuttuvat_kansiot(os.path.dirname(tiedosto), self.uid(), self.gid())
 
-        with open(tiedosto, "wb") as kohde:
-            kohde.write(sisältö)
+            with open(tiedosto, "wb") as kohde:
+                kohde.write(sisältö)
 
-        os.chmod(tiedosto, self.oikeudet)
-        os.chown(tiedosto, self.uid(), self.gid())
+            os.chmod(tiedosto, self.oikeudet)
+            os.chown(tiedosto, self.uid(), self.gid())
+        except OSError as e:
+            log.virhe(f"Tiedoston '{tiedosto}' luonti epäonnistui.")
+            log.virhetiedot(e)
+            exit(30)
 
         return [ tiedosto ]
 
@@ -58,8 +59,13 @@ class Kansio:
         self.oikeudet = oikeudet
 
     def kirjoita_kansioon(self, kansio):
-        """Kirjoittaa kaikki sisältönsä syötettyyn kansioon."""
+        try:
+            return self._kirjoita_kansioon(kansio)
+        except OSError as e:
+            log.virhe(f"Kansion {self.lähde} kopiointi kohteeseen {kansio} epäonnistui.")
+            exit(31)
 
+    def _kirjoita_kansioon(self, kansio):
         luodut_tiedostot = []
 
         for lähdekansio, _, lähdekansion_tiedostot in os.walk(self.lähde):
@@ -77,8 +83,8 @@ class Kansio:
                             kohde.write(lähde.read())
                             luodut_tiedostot.append(kohdetiedosto)
                 except OSError as e:
-                    print(f"Kansiota '{kansio}' luodess tiedoston '{lähdetiedosto}' kopiointi kohteeseen '{kohdetiedosto}' epäonnistui.")
-                    print(e)
+                    log.virhe(f"Kansiota '{kansio}' luodessa tiedoston '{lähdetiedosto}' kopiointi kohteeseen '{kohdetiedosto}' epäonnistui.")
+                    raise
 
                 os.chmod(kohdetiedosto, self.oikeudet)
                 os.chown(kohdetiedosto, self.uid(), self.gid())
@@ -137,3 +143,4 @@ mkinitcpio = asentaja.mkinitcpio.Mkinitcpio()
 
 import asentaja.doas
 doas = asentaja.doas.Doas()
+

@@ -154,8 +154,6 @@ Asentaja suorittaa tarvittavat operaatiot seuraavassa järjestyksessä.
 9. Suorittaa generoimiskomennot (mkinitcpio, grub)
 10. Suorittaa muut lopetuskomennot
 
-Asentaja on suunniteltu jatkamaan toimintaansa siitä huolimatta, että se mahdollisesti kohtaa virheitä. Poikkeuksena tähän ovat virheet, jotka koskevat järjestelmän pakettien listausta ja päivittämistä sekä uusien pakettien asentamista. Näissä tapauksissa Asentaja lopettaa suorittamisensa. Muulloin vain virheistä tiedotetaan.
-
 ## Automaattisesti asennetut paketit
 
 Asentaja asentaa automaattisesti itse tarvitsemansa paketit sekä paketit minimaalisen Arch Linuxin ylläpitoon. Sen lisäksi Asentaja huolehtii itse grub, mkinitcpio ja doas -ohjelmien asetuksien säätämisestä, jolloin niitä ei tarvitse tehdä *täysin* manuaalisesti (kts. esimerkkitiedosto).
