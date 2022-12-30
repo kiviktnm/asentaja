@@ -2,7 +2,7 @@ import asentaja
 
 class Grub:
     kernel_parametrit = []
-    aktivoi_os_prober = True
+    aktivoi_os_prober = False
     oletusasetukset = """# Tämä tiedosto on Asentajan automaattisesti luoma.
 GRUB_CMDLINE_LINUX=""
 
