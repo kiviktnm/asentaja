@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+if [ "$EUID" -ne 0 ]
+    then echo "Suorita ohjelma root-käyttäjänä."
+    exit 1
+fi
+
+cp /opt/asentaja/bin/asentaja /usr/local/bin/asentaja
+cp /opt/asentaja/bin/päivitä-asentaja /usr/local/bin/päivitä-asentaja
+chmod +x /usr/local/bin/asentaja
+chmod +x /usr/local/bin/päivitä-asentaja
+
