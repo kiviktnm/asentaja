@@ -13,7 +13,7 @@ def lue_lista(nimi, oletus=[], salli_virheet=True):
     tiedosto = os.path.join(asentaja.asetukset.tiedostojärjestelmän_alku, _sijainti, nimi)
     try:
         with open(tiedosto, "rt") as t:
-            return t.read().split()
+            return t.read().split("\n")
     except OSError as e:
         if salli_virheet:
             log.varoitus(f"Asentajan oman tiedoston '{tiedosto}' luku epäonnistui.")
