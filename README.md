@@ -121,7 +121,7 @@ Päivityskomentoa tulee käyttää jatkossa järjestelmän päivittämiseen ja j
 # asentaja --päivitä
 ```
 
-Asentajan päivityskomento on hitaampi kuin päivitys pelkästään esim. `pikaur -Syu` komennolla, koska Asentaja uudelleenrakentaa Grub-asetukset ym. joka päivityksen yhteydessä varmuuden vuoksi. On siis teoriassa mahdollista nopeuttaa päivitystä manuaalisen komennon suorittamisella, mutta tämä ei ole suositeltavaa.
+Asentajan päivityskomento on hitaampi kuin päivitys pelkästään esim. `pikaur -Syu` komennolla, koska Asentaja uudelleenrakentaa Grub-asetukset ym. joka päivityksen yhteydessä varmuuden vuoksi. On siis teoriassa mahdollista nopeuttaa päivitystä manuaalisen komennon suorittamisella, mutta tämä ei ole suositeltavaa ja voi johtaa erilaisiin ongelmiin.
 
 Pelkästään tiedostojen päivittäminen onnistuu lisäämällä komentoon argumentin `--vain-tiedostot`. Tämä on käytännöllistä esimerkiksi silloin, kun työskentelee asetustiedostojen parissa.
 
