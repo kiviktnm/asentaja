@@ -140,7 +140,7 @@ def _deaktivoi_poistetut_palvelut(nykyiset_palvelut):
     if deaktivoitavat_palvelut:
         log.info(f"Deaktivoidaan palvelut '{' '.join(deaktivoitavat_palvelut)}'.")
         try:
-            subprocess.run(cmd["deaktivoi-palvelu"].format(" ".join(deaktivoitavat_palvelut), shell=True, check=True))
+            subprocess.run(cmd["deaktivoi-palvelu"].format(" ".join(deaktivoitavat_palvelut)), shell=True, check=True)
         except subprocess.CalledProcessError as e:
             log.virhe(f"Palveluiden '{' '.join(deaktivoitavat_palvelut)}' deaktivointi epäonnistui.")
             log.virhetiedot(e)
