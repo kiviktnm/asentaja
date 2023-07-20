@@ -84,15 +84,24 @@ asentaja.tiedostot["/etc/hostname"] = asentaja.Tiedosto(lähde="nimi.txt")
 # Kuten tiedostoja Asentaja voi asentaa myös kansioita.
 asentaja.kansiot["/home/kk/.bin/"] = asentaja.Kansio(lähde="bin/", omistaja="kk", oikeudet=0o744)
 
+# Tiedostoille ja kansioille voi määritellä tiedostomuuttujia, eli merkkijonoja jotka korvataan jollain muilla.
+tiedostomuuttujat = {
+    "%PLC%: "placeholder",
+    "%user%: "kk",
+}
+
+# Nyt tässä tiedostossa ja kansion tiedostoissa merkkijonot '%PLC%' ja '%user%' korvaantuvat merkkijonoilla 'placeholder' ja 'kk'.
+asentaja.tiedostot["/etc/jotain-asetuksia"] = asentaja.Tiedosto(lähde="src.conf", tiedostomuuttujat=tiedostomuuttujat)
+asentaja.kansiot["/home/kk/kansio/"] = asentaja.Kansio(lähde="kansio/", tiedostomuuttujat=tiedostomuuttujat)
+
 # Määrittele komennot, jotka Asentaja suorittaa päivityksen jälkeen. Huomaa, että komennot suoritetaan root-käyttäjän oikeuksin.
 asentaja.lopetuskomennot += [ "locale-gen" ]
 
 # Määrittele komennot, jotka Asentaja suorittaa vain yhden kerran kun ne ensimmäisen kerran määritellään.
 asentaja.aktivointikomennot += [ "echo En keksi parempaa esimerkkiä" ]
 
-# Kokonaisuudet on tapa organisoida yhteen liittyviä kokonaisuuksia. Samalla ne mahdollistavat deaktivointikomentojen ja tiedostomuuttujien käytön. Kokonaisuudella on uniikki nimi.
+# Kokonaisuudet on tapa organisoida yhteen liittyviä kokonaisuuksia. Samalla ne mahdollistavat deaktivointikomentojen käytön. Kokonaisuudella on uniikki nimi.
 # Deaktivointikomennot ovat komentoja, jotka suoritetaan kun kokonaisuus poistetaan käytöstä.
-# Tiedostomuuttujat ovat tekstipätkiä, jotka korvataan *kaikissa* tiedostoissa (ja kansioiden sisältämissä tiedostoissa).
 asentaja.kokonaisuudet["esimerkki"] = {
     "paketit": [ "esimerkki" ],
     "palvelut": [ "esimerkki.service" ],

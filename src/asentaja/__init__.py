@@ -15,12 +15,13 @@ def _luo_puuttuvat_kansiot(kansio, omistaja_uid, ryhmä_gid):
         os.chown(kansio, omistaja_uid, ryhmä_gid)
 
 class Tiedosto:
-    def __init__(self, lähde=None, sisältö="", oikeudet=0o644, omistaja="root", ryhmä="root"):
+    def __init__(self, lähde=None, sisältö="", oikeudet=0o644, omistaja="root", ryhmä="root", tiedostomuuttujat=None):
         self.lähde = lähde
         self.sisältö = sisältö
         self.oikeudet = oikeudet
         self.omistaja = omistaja
         self.ryhmä = ryhmä
+        self.tiedostomuuttujat = tiedostomuuttujat
 
     def kirjoita_tiedostoon(self, tiedosto):
         sisältö = bytes(self.sisältö, "utf-8")
@@ -31,6 +32,10 @@ class Tiedosto:
                     sisältö = lähde.read()
 
             _luo_puuttuvat_kansiot(os.path.dirname(tiedosto), self.uid(), self.gid())
+
+            if self.tiedostomuuttujat is not None:
+                for korvattava, korvaaja in self.tiedostomuuttujat.items():
+                    sisältö = sisältö.replace(bytes(korvattava), bytes(korvaaja))
 
             with open(tiedosto, "wb") as kohde:
                 kohde.write(sisältö)
@@ -52,11 +57,12 @@ class Tiedosto:
 
 
 class Kansio:
-    def __init__(self, lähde, omistaja="root", ryhmä="root", oikeudet=0o644):
+    def __init__(self, lähde, omistaja="root", ryhmä="root", oikeudet=0o644, tiedostomuuttujat=None):
         self.lähde = lähde
         self.omistaja = omistaja
         self.ryhmä = ryhmä
         self.oikeudet = oikeudet
+        self.tiedostomuuttujat = tiedostomuuttujat
 
     def kirjoita_kansioon(self, kansio):
         try:
@@ -79,9 +85,15 @@ class Kansio:
 
                 try:
                     with open(lähdetiedosto, "rb") as lähde:
-                        with open(kohdetiedosto, "wb") as kohde:
-                            kohde.write(lähde.read())
-                            luodut_tiedostot.append(kohdetiedosto)
+                        sisältö = lähde.read()
+
+                    if self.tiedostomuuttujat is not None:
+                        for korvattava, korvaaja in self.tiedostomuuttujat.items():
+                            sisältö = sisältö.replace(bytes(korvattava), bytes(korvaaja))
+
+                    with open(kohdetiedosto, "wb") as kohde:
+                        kohde.write(sisältö)
+                        luodut_tiedostot.append(kohdetiedosto)
                 except OSError as e:
                     log.virhe(f"Kansiota '{kansio}' luodessa tiedoston '{lähdetiedosto}' kopiointi kohteeseen '{kohdetiedosto}' epäonnistui.")
                     raise
