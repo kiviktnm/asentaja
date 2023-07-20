@@ -13,7 +13,11 @@ def lue_lista(nimi, oletus=[], salli_virheet=True):
     tiedosto = os.path.join(asentaja.asetukset.tiedostojärjestelmän_alku, _sijainti, nimi)
     try:
         with open(tiedosto, "rt") as t:
-            return t.read().split("\n")
+            lista = t.read().split("\n")
+            # Jos lista on vain [''], niin silloin sitä tulee käsitellä tyhjänä listana
+            if lista == ['']:
+                return []
+            return lista
     except OSError as e:
         if salli_virheet:
             log.varoitus(f"Asentajan oman tiedoston '{tiedosto}' luku epäonnistui.")
@@ -38,6 +42,22 @@ def kirjoita_lista(nimi, sisältö=[], salli_virheet=False):
             log.varoitus(f"Oletetaan, että virhe on merkityksetön.")
         else:
             log.virhe(f"Asentajan oman tiedoston '{tiedosto}' kirjoitus epäonnistui.")
+            log.virhetiedot(e)
+            exit(21)
+
+
+def poista_lista(nimi, salli_virheet=False):
+    kansio = os.path.join(asentaja.asetukset.tiedostojärjestelmän_alku, _sijainti)
+    tiedosto = os.path.join(kansio, nimi)
+    try:
+        os.makedirs(kansio, exist_ok=True)
+        os.remove(tiedosto)
+    except OSError as e:
+        if salli_virheet:
+            log.varoitus(f"Asentajan oman tiedoston '{tiedosto}' poisto epäonnistui.")
+            log.varoitus(f"Oletetaan, että virhe on merkityksetön.")
+        else:
+            log.virhe(f"Asentajan oman tiedoston '{tiedosto}' poisto epäonnistui.")
             log.virhetiedot(e)
             exit(21)
 
