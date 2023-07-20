@@ -45,3 +45,19 @@ def kirjoita_lista(nimi, sisältö=[], salli_virheet=False):
             log.virhetiedot(e)
             exit(21)
 
+
+def poista_lista(nimi, salli_virheet=False):
+    kansio = os.path.join(asentaja.asetukset.tiedostojärjestelmän_alku, _sijainti)
+    tiedosto = os.path.join(kansio, nimi)
+    try:
+        os.makedirs(kansio, exist_ok=True)
+        os.remove(tiedosto)
+    except OSError as e:
+        if salli_virheet:
+            log.varoitus(f"Asentajan oman tiedoston '{tiedosto}' poisto epäonnistui.")
+            log.varoitus(f"Oletetaan, että virhe on merkityksetön.")
+        else:
+            log.virhe(f"Asentajan oman tiedoston '{tiedosto}' poisto epäonnistui.")
+            log.virhetiedot(e)
+            exit(21)
+

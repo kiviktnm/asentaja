@@ -71,11 +71,17 @@ def _käsittele_kokonaisuudet(vain_tiedostot):
         tiedostomuuttujat = asentaja.kokonaisuudet[kokonaisuus].get("tiedostomuuttujat", {})
 
         for tiedostonimi, tiedosto in asentaja.kokonaisuudet[kokonaisuus].get("tiedostot", {}).items():
-            tiedosto.tiedostomuuttujat.update(tiedostomuuttujat)
+            if tiedosto.tiedostomuuttujat is not None:
+                tiedosto.tiedostomuuttujat.update(tiedostomuuttujat)
+            else:
+                tiedosto.tiedostomuuttujat = tiedostomuuttujat
             asentaja.tiedostot[tiedostonimi] = tiedosto
 
         for kansionimi, kansio in asentaja.kokonaisuudet[kokonaisuus].get("kansiot", {}).items():
-            kansio.tiedostomuuttujat.update(tiedostomuuttujat)
+            if kansio.tiedostomuuttujat is not None:
+                kansio.tiedostomuuttujat.update(tiedostomuuttujat)
+            else:
+                kansio.tiedostomuuttujat = tiedostomuuttujat
             asentaja.kansiot[kansionimi] = kansio
 
         # Jos vain tiedostot käsitellään, kokonaisuuksistakin käsitellään vain tiedostot ja kansiot.
@@ -88,7 +94,7 @@ def _käsittele_kokonaisuudet(vain_tiedostot):
         asentaja.aktivointikomennot += asentaja.kokonaisuudet[kokonaisuus].get("aktivointikomennot", [])
 
         deaktivointikomennot = asentaja.kokonaisuudet[kokonaisuus].get("deaktivointikomennot", [])
-        asentaja.tallennus.kirjoita_lista(f"deaktivointikomennot/{kokonaisuus}", sisältö=deaktivointikomennot)
+        asentaja.tallennus.kirjoita_lista(f"deaktivointikomennot-{kokonaisuus}", sisältö=deaktivointikomennot)
 
 
 def _päivitä():
@@ -231,13 +237,14 @@ def _suorita_deaktivointikomennot(nykyiset_kokonaisuudet):
         log.info(f"Deaktivoidaan kokonaisuudet '{' '.join(deaktivoidut_kokonaisuudet)}'.")
 
         for deaktivoitu_kokonaisuus in deaktivoidut_kokonaisuudet:
-            for deaktivointikomento in asentaja.tallennus.lue_lista(f"deaktivointikomennot/{deaktivoitu_kokonaisuus}"):
+            for deaktivointikomento in asentaja.tallennus.lue_lista(f"deaktivointikomennot-{deaktivoitu_kokonaisuus}"):
                 log.info(f"Suoritetaan deaktivointikomento '{deaktivointikomento}'.")
                 try:
                     subprocess.run(deaktivointikomento, shell=True, check=True)
                 except subprocess.CalledProcessError as e:
                     log.varoitus(f"Deaktivointikomennon '{deaktivointikomento}' suorittaminen epäonnistui.")
                     log.virhetiedot(e)
+            asentaja.tallennus.poista_lista(f"deaktivointikomennot-{deaktivoitu_kokonaisuus}", salli_virheet=True)
     else:
         log.info("Ei deaktivoitavia kokonaisuuksia.")
 

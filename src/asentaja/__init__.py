@@ -35,7 +35,7 @@ class Tiedosto:
 
             if self.tiedostomuuttujat is not None:
                 for korvattava, korvaaja in self.tiedostomuuttujat.items():
-                    sisältö = sisältö.replace(bytes(korvattava), bytes(korvaaja))
+                    sisältö = sisältö.replace(bytes(korvattava, "utf-8"), bytes(korvaaja, "utf-8"))
 
             with open(tiedosto, "wb") as kohde:
                 kohde.write(sisältö)
@@ -89,7 +89,7 @@ class Kansio:
 
                     if self.tiedostomuuttujat is not None:
                         for korvattava, korvaaja in self.tiedostomuuttujat.items():
-                            sisältö = sisältö.replace(bytes(korvattava), bytes(korvaaja))
+                            sisältö = sisältö.replace(bytes(korvattava, "utf-8"), bytes(korvaaja, "utf-8"))
 
                     with open(kohdetiedosto, "wb") as kohde:
                         kohde.write(sisältö)
