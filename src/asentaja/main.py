@@ -17,6 +17,8 @@ def päivitys(vain_tiedostot=False):
     asentaja.mkinitcpio.asenna()
     asentaja.doas.asenna()
 
+    _käsittele_kokonaisuudet(vain_tiedostot)
+
     nykyiset_tiedostot = asentaja.tallennus.lue_lista("kirjoitetut-tiedostot")
 
     if vain_tiedostot:
@@ -35,6 +37,7 @@ def päivitys(vain_tiedostot=False):
 
     nykyiset_palvelut = asentaja.tallennus.lue_lista("aktivoidut-palvelut")
     suoritetut_aktivointikomennot = asentaja.tallennus.lue_lista("suoritetut-aktivointikomennot")
+    nykyiset_kokonaisuudet = asentaja.tallennus.lue_lista("aktivoidut-kokonaisuudet")
 
     _päivitä()
     _asenna_uudet_paketit(nykyiset_paketit)
@@ -45,6 +48,7 @@ def päivitys(vain_tiedostot=False):
     _deaktivoi_poistetut_palvelut(nykyiset_palvelut)
     _poista_poistetut_paketit(nykyiset_paketit)
     _tuhoa_poistetut_tiedostot(nykyiset_tiedostot, luodut_tiedostot)
+    _suorita_deaktivointikomennot(nykyiset_kokonaisuudet)
 
     kaikki_suoritetut_aktivointikomennot = _suorita_aktivointikomennot(suoritetut_aktivointikomennot)
 
@@ -55,6 +59,36 @@ def päivitys(vain_tiedostot=False):
     asentaja.tallennus.kirjoita_lista("kirjoitetut-tiedostot", sisältö=luodut_tiedostot)
     asentaja.tallennus.kirjoita_lista("aktivoidut-palvelut", sisältö=kaikki_aktivoidut_palvelut)
     asentaja.tallennus.kirjoita_lista("suoritetut-aktivointikomennot", sisältö=kaikki_suoritetut_aktivointikomennot)
+    asentaja.tallennus.kirjoita_lista("aktivoidut-kokonaisuudet", sisältö=asentaja.aktiiviset_kokonaisuudet)
+
+
+def _käsittele_kokonaisuudet(vain_tiedostot):
+    for kokonaisuus in asentaja.aktiiviset_kokonaisuudet:
+        if kokonaisuus not in asentaja.kokonaisuudet.keys():
+            log.varoitus(f"Kokonaisuutta '{kokonaisuus}' ei ole määritelty. Se jätetään huomiotta.")
+            continue
+
+        tiedostomuuttujat = asentaja.kokonaisuudet[kokonaisuus].get("tiedostomuuttujat", {})
+
+        for tiedostonimi, tiedosto in asentaja.kokonaisuudet[kokonaisuus].get("tiedostot", {}).items():
+            tiedosto.tiedostomuuttujat.update(tiedostomuuttujat)
+            asentaja.tiedostot[tiedostonimi] = tiedosto
+
+        for kansionimi, kansio in asentaja.kokonaisuudet[kokonaisuus].get("kansiot", {}).items():
+            kansio.tiedostomuuttujat.update(tiedostomuuttujat)
+            asentaja.kansiot[kansionimi] = kansio
+
+        # Jos vain tiedostot käsitellään, kokonaisuuksistakin käsitellään vain tiedostot ja kansiot.
+        if vain_tiedostot:
+            continue
+
+        asentaja.paketit += asentaja.kokonaisuudet[kokonaisuus].get("paketit", [])
+        asentaja.palvelut += asentaja.kokonaisuudet[kokonaisuus].get("palvelut", [])
+        asentaja.lopetuskomennot += asentaja.kokonaisuudet[kokonaisuus].get("lopetuskomennot", [])
+        asentaja.aktivointikomennot += asentaja.kokonaisuudet[kokonaisuus].get("aktivointikomennot", [])
+
+        deaktivointikomennot = asentaja.kokonaisuudet[kokonaisuus].get("deaktivointikomennot", [])
+        asentaja.tallennus.kirjoita_lista(f"deaktivointikomennot/{kokonaisuus}", sisältö=deaktivointikomennot)
 
 
 def _päivitä():
@@ -184,6 +218,28 @@ def _tuhoa_poistetut_tiedostot(nykyiset_tiedostot, luodut_tiedostot):
 
     if poistettiinko_tiedostoja:
         log.info("Ei tiedostoja poistettavaksi.")
+
+
+def _suorita_deaktivointikomennot(nykyiset_kokonaisuudet):
+    deaktivoidut_kokonaisuudet = []
+
+    for kokonaisuus in nykyiset_kokonaisuudet:
+        if kokonaisuus not in asentaja.aktiiviset_kokonaisuudet:
+            deaktivoidut_kokonaisuudet.append(kokonaisuus)
+
+    if deaktivoidut_kokonaisuudet:
+        log.info(f"Deaktivoidaan kokonaisuudet '{' '.join(deaktivoidut_kokonaisuudet)}'.")
+
+        for deaktivoitu_kokonaisuus in deaktivoidut_kokonaisuudet:
+            for deaktivointikomento in asentaja.tallennus.lue_lista(f"deaktivointikomennot/{deaktivoitu_kokonaisuus}"):
+                log.info(f"Suoritetaan deaktivointikomento '{deaktivointikomento}'.")
+                try:
+                    subprocess.run(deaktivointikomento, shell=True, check=True)
+                except subprocess.CalledProcessError as e:
+                    log.varoitus(f"Deaktivointikomennon '{deaktivointikomento}' suorittaminen epäonnistui.")
+                    log.virhetiedot(e)
+    else:
+        log.info("Ei deaktivoitavia kokonaisuuksia.")
 
 
 def _suorita_aktivointikomennot(suoritetut_aktivointikomennot):

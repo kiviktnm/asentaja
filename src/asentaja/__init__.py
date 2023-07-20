@@ -147,6 +147,10 @@ lopetuskomennot: list[str] = []
 
 aktivointikomennot: list[str] = []
 
+kokonaisuudet = {}
+
+aktiiviset_kokonaisuudet = []
+
 import asentaja.grub
 grub = asentaja.grub.Grub()
 
