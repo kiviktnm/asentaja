@@ -209,10 +209,13 @@ def _suorita_aktivointikomennot(suoritetut_aktivointikomennot):
 def _suorita_lopetuskomennot():
     grub_asetusten_sijainti = os.path.join(tiedostojärjestelmän_alku, "boot/grub/grub.cfg")
 
-    log.info("Suoritetaan grub ja mkinitcpio -luomiskomennot.")
     try:
-        subprocess.run(cmd["luo-grub-asetukset"].format(grub_asetusten_sijainti), shell=True, check=True)
-        subprocess.run(cmd["generoi-mkinitcpio"], shell=True, check=True)
+        if asentaja.grub.suorita_generoimiskomento:
+            log.info("Suoritetaan grub-luomiskomento.")
+            subprocess.run(cmd["luo-grub-asetukset"].format(grub_asetusten_sijainti), shell=True, check=True)
+        if asentaja.mkinitcpio.suorita_generoimiskomento:
+            log.info("Suoritetaan mkinitcpio-luomiskomento.")
+            subprocess.run(cmd["generoi-mkinitcpio"], shell=True, check=True)
     except subprocess.CalledProcessError as e:
         log.virhe("Grub tai mkinitcpio -luomiskomentojen suorittaminen epäonnistui.")
         log.virhetiedot(e)

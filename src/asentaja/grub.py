@@ -1,4 +1,5 @@
 import asentaja
+import asentaja.logger as log
 
 class Grub:
     kernel_parametrit = []
@@ -20,6 +21,7 @@ GRUB_GFXMODE=auto
 GRUB_GFXPAYLOAD_LINUX=keep
 GRUB_DISABLE_RECOVERY=true"""
     lisäasetukset = ""
+    suorita_generoimiskomento = False
 
     def asenna(self):
         grub_asetukset = f"""{self.oletusasetukset}
@@ -32,6 +34,21 @@ GRUB_CMDLINE_LINUX_DEFAULT="{" ".join(self.kernel_parametrit)}"
             grub_asetukset += "GRUB_DISABLE_OS_PROBER=true\n"
 
         grub_asetukset += self.lisäasetukset
+
+        # Tarkista onko grub asetustiedoston sisältö muuttunut. Jos sisältö on muuttunut, generoimiskomento tulee suorittaa.
+
+        try:
+            with open("/etc/default/grub", "rt") as asetustiedosto:
+                entiset_asetukset = asetustiedosto.read()
+            if entiset_asetukset != grub_asetukset:
+                log.info("Grub asetukset ovat muuttuneet. Generoimiskomento suoritetaan.")
+                self.suorita_generoimiskomento = True
+            else:
+                log.info("Grub asetukset eivät ole muuttuneet. Generoimiskomentoa ei suoriteta.")
+        except OSError:
+            log.varoitus("Grub asetustiedoston sisällön luku epäonnistui. Generoimiskomento suoritetaan.")
+            self.suorita_generoimiskomento = True
+
         asentaja.tiedostot["/etc/default/grub"] = asentaja.Tiedosto(sisältö=grub_asetukset)
 
 
