@@ -90,6 +90,31 @@ asentaja.lopetuskomennot += [ "locale-gen" ]
 # Määrittele komennot, jotka Asentaja suorittaa vain yhden kerran kun ne ensimmäisen kerran määritellään.
 asentaja.aktivointikomennot += [ "echo En keksi parempaa esimerkkiä" ]
 
+# Kokonaisuudet on tapa organisoida yhteen liittyviä kokonaisuuksia. Samalla ne mahdollistavat deaktivointikomentojen ja tiedostomuuttujien käytön. Kokonaisuudella on uniikki nimi.
+# Deaktivointikomennot ovat komentoja, jotka suoritetaan kun kokonaisuus poistetaan käytöstä.
+# Tiedostomuuttujat ovat tekstipätkiä, jotka korvataan *kaikissa* tiedostoissa (ja kansioiden sisältämissä tiedostoissa).
+asentaja.kokonaisuudet["esimerkki"] = {
+    "paketit": [ "esimerkki" ],
+    "palvelut": [ "esimerkki.service" ],
+    "lopetuskomennot": [ "esimerkkikomento" ],
+    "aktivointikomennot": [ "esimerkkikomento" ],
+    "deaktivointikomennot": [ "esimerkkikomento" ],
+    "tiedostot": {
+        "/etc/esimerkki": asentaja.Tiedosto(sisältö="esimerkki"),
+    },
+    "kansiot" : {
+        "/home/kk/esimerkki/": asentaja.Kansio(lähde="esimerkki/", omistaja="kk"),
+    },
+    "tiedostomuuttujat": {
+        "%PÄÄVÄRI%": "#000000",
+    }
+}
+
+# Kokonaisuudet pitää aktivoida erikseen. Tällä tavalla voi helposti valita, mitä kokonaisuuksia järjestelmässä käyttää.
+asentaja.aktiiviset_kokonaisuudet = [
+    "esimerkki",
+]
+
 # Määrittele kernelin parametrit.
 # Muiden grub asetusten asettaminen tapahtuu myös tämän tiedoston avulla erikseen määriteltyjen asetuksien avulla.
 asentaja.grub.kernel_parametrit += [ "quiet", "splash" ]
@@ -121,7 +146,7 @@ Päivityskomentoa tulee käyttää jatkossa järjestelmän päivittämiseen ja j
 # asentaja --päivitä
 ```
 
-Asentajan päivityskomento on hitaampi kuin päivitys pelkästään esim. `pikaur -Syu` komennolla, koska Asentaja uudelleenrakentaa Grub-asetukset ym. joka päivityksen yhteydessä varmuuden vuoksi. On siis teoriassa mahdollista nopeuttaa päivitystä manuaalisen komennon suorittamisella, mutta tämä ei ole suositeltavaa ja voi johtaa erilaisiin ongelmiin.
+Asentajan päivityskomento on hitaampi kuin päivitys pelkästään esim. `pikaur -Syu` komennolla, koska Asentaja suorittaa ylimääräisiä komentoja ja esimerkiksi kirjoittaa tiedostot aina uudelleen. On siis teoriassa mahdollista nopeuttaa päivitystä manuaalisen komennon suorittamisella, mutta tämä ei ole suositeltavaa ja voi johtaa erilaisiin ongelmiin.
 
 Pelkästään tiedostojen päivittäminen onnistuu lisäämällä komentoon argumentin `--vain-tiedostot`. Tämä on käytännöllistä esimerkiksi silloin, kun työskentelee asetustiedostojen parissa.
 
@@ -150,9 +175,10 @@ Asentaja suorittaa tarvittavat operaatiot seuraavassa järjestyksessä.
 5. Deaktivoi poistetut palvelut
 6. Poistaa poistetut paketit
 7. Tuhoaa poisteut tiedostot
-8. Suorittaa vain kerran suoritettavat aktivointikomennot
-9. Suorittaa generoimiskomennot (mkinitcpio, grub)
-10. Suorittaa muut lopetuskomennot
+8. Suorittaa deaktivointikomennot.
+9. Suorittaa vain kerran suoritettavat aktivointikomennot
+10. Suorittaa generoimiskomennot (mkinitcpio, grub), jos grub tai mkinitcpio asetukset ovat muuttuneet.
+11. Suorittaa muut lopetuskomennot
 
 ## Automaattisesti asennetut paketit
 
