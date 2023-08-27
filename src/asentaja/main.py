@@ -46,7 +46,7 @@ def päivitys(vain_tiedostot=False):
     luodut_tiedostot = _luo_tiedostot()
     kaikki_aktivoidut_palvelut = _aktivoi_uudet_palvelut(nykyiset_palvelut)
     _deaktivoi_poistetut_palvelut(nykyiset_palvelut)
-    _poista_poistetut_paketit(nykyiset_paketit)
+    _poista_poistetut_paketit()
     _tuhoa_poistetut_tiedostot(nykyiset_tiedostot, luodut_tiedostot)
     _suorita_deaktivointikomennot(nykyiset_kokonaisuudet)
 
@@ -189,8 +189,16 @@ def _deaktivoi_poistetut_palvelut(nykyiset_palvelut):
         log.info("Ei palveluita deaktivoitavaksi.")
 
 
-def _poista_poistetut_paketit(nykyiset_paketit):
+def _poista_poistetut_paketit():
     poistettavat_paketit = []
+
+    # Nykyiset paketit selvitetään uudestaan, koska asennuksen aikana joku paketti on voinut korvata toisen.
+    try:
+        nykyiset_paketit = subprocess.check_output(cmd["listaa-asennetut"], shell=True).decode().split()
+    except subprocess.CalledProcessError as e:
+        log.virhe("Pakettien listaus epäonnistui.")
+        log.virhetiedot(e)
+        exit(10)
 
     for paketti in nykyiset_paketit:
         if paketti not in asentaja.paketit:
